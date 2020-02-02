@@ -11,7 +11,7 @@ def patched_init():
 
 @pytest.mark.parametrize("width", [2, 5])
 @pytest.mark.parametrize("height", [2, 5])
-def test_creates_board(patched_init, width, height):
+def test_creates_board(width, height):
 
     board = VoltorbFlip._generate_board(width, height)
     assert len(board) == height
@@ -33,6 +33,34 @@ def test_sets_states(patched_init, width, height):
             for i in range(height)
         ]
     )
+
+
+@pytest.mark.parametrize(
+    ["board", "points"],
+    [
+        # fmt: off
+        (
+            [[1, 2, 0],
+             [0, 3, 1],
+             [1, 0, 0]],
+
+            6
+        ),
+        (
+            [[0, 1, 2, 3, 0],
+             [1, 0, 0, 0, 3],
+             [1, 0, 0, 3, 1],
+             [1, 3, 0, 2, 1],
+             [3, 1, 1, 2, 0]],
+
+            1944
+        )
+        # fmt: on
+    ],
+)
+def test_calculate_max_points(board, points):
+    actual = VoltorbFlip._calculate_winning_score(board)
+    assert actual == points
 
 
 @pytest.mark.parametrize(
