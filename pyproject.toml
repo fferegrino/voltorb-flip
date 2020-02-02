@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "voltorb-flip"
-version = "0.1.0"
+version = "0.0.0"
 description = ""
 authors = ["Antonio Feregrino <antonio.feregrino@gmail.com>"]
 
@@ -8,7 +8,14 @@ authors = ["Antonio Feregrino <antonio.feregrino@gmail.com>"]
 python = "^3.7"
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.0"
+advbumpversion = "^1.2"
+bandit = "^1.6"
+black = {version = "^18.3-alpha.0", allows-prereleases = true}
+freezegun = "^0.3.12"
+isort = "^4.3"
+moto = "^1.3"
+pylint = "^2.4"
+pytest = "^5.2"
 
 [build-system]
 requires = ["poetry>=0.12"]
