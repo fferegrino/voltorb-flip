@@ -96,6 +96,12 @@ class VoltorbFlip:
         ) = VoltorbFlip._calculate_borders(self.board)
         self.maximum_points = VoltorbFlip._calculate_winning_score(self.board)
 
+    def mark(self, row, column):
+        self._change_cell_state(row, column, CellState.MARKED)
+
+    def unmark(self, row, column):
+        self._change_cell_state(row, column, CellState.COVERED)
+
     def flip(self, row, column):
         if self.state != GameState.IN_PROGRESS:
             raise GameOverException(state=self.state)
@@ -103,7 +109,7 @@ class VoltorbFlip:
         if self.cell_states[row][column] != CellState.COVERED:
             raise UnableToFlipException(cell_state=self.cell_states[row][column])
 
-        self.cell_states[row][column] = CellState.UNCOVERED
+        self._change_cell_state(row, column, CellState.UNCOVERED)
         self.score *= self.board[row][column]
 
         self._win_or_lose()
@@ -114,3 +120,8 @@ class VoltorbFlip:
         elif self.score == 0:
             self.state = GameState.LOST
             raise GameLostException()
+
+    def _change_cell_state(self, row, column, new_state):
+        if self.cell_states[row][column] == CellState.UNCOVERED:
+            return
+        self.cell_states[row][column] = new_state
