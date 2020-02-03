@@ -102,6 +102,13 @@ class VoltorbFlip:
     def unmark(self, row, column):
         self._change_cell_state(row, column, CellState.COVERED)
 
+    def toggle_mark(self, row, column):
+        if self.cell_states[row][column] == CellState.MARKED:
+            self._change_cell_state(row, column, CellState.COVERED)
+        elif self.cell_states[row][column] == CellState.COVERED:
+            self._change_cell_state(row, column, CellState.MARKED)
+
+
     def flip(self, row, column):
         if self.state != GameState.IN_PROGRESS:
             raise GameOverException(state=self.state)

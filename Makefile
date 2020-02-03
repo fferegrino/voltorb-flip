@@ -22,7 +22,7 @@ lint:
 	$(POETRY_RUN) pylint $(SOURCES_FOLDER)
 
 test:
-	$(POETRY_RUN) pytest -vvv tests
+	$(POETRY_RUN) pytest --cov=$(SOURCES_FOLDER) tests
 
 check_on_master:
 ifeq ($(BRANCH),master)

@@ -10,7 +10,7 @@ from voltorb_flip.game import (
     VoltorbFlip,
 )
 
-COVERED_CHARACTER = "X"
+COVERED_CHARACTER = "?"
 MARKED_CHARACTER = "M"
 COMMAND_REGEX = re.compile(r"([fmq])(?:([a-z])([\d]))?")
 
@@ -59,14 +59,18 @@ class ConsoleGame:
         if not action:
             return True
         action, row, column = action.groups()
+        if action == "q":
+            return False
+
+        actual_row = ord(row) - ord("a")
+        actual_column = int(column) - 1
+
         if action == "f":
-            actual_row = ord(row) - ord("a")
-            actual_column = int(column) - 1
-            print(f"Flip {actual_row} {actual_column}")
             self.game.flip(actual_row, actual_column)
             return True if self.game.state == GameState.IN_PROGRESS else False
-        elif action == "q":
-            return False
+        elif action == "m":
+            self.game.toggle_mark(actual_row, actual_column)
+            return True
 
     def process_input(self):
         print(f"Error! {self.latest_error}" if self.latest_error else "")
