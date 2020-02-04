@@ -32,20 +32,17 @@ class ConsoleGame:
             for column in range(game.width):
                 value = ConsoleGame._get_cell_value(column, game, row)
                 row_str = row_str + f" [ {value} ] "
-            else:
-                row_str = (
-                    row_str
-                    + f" {game.horizontal_points[row]}/{game.horizontal_bombs[row]}"
-                )
-            game_string.append(row_str)
-        else:
-            ver_stats_row = "    ".join(
-                [
-                    f"{game.vertical_points[column]}/{game.vertical_bombs[column]}"
-                    for column in range(game.width)
-                ]
+            row_str = (
+                row_str + f" {game.horizontal_points[row]}/{game.horizontal_bombs[row]}"
             )
-            game_string.append(" " * 5 + ver_stats_row)
+            game_string.append(row_str)
+        ver_stats_row = "    ".join(
+            [
+                f"{game.vertical_points[column]}/{game.vertical_bombs[column]}"
+                for column in range(game.width)
+            ]
+        )
+        game_string.append(" " * 5 + ver_stats_row)
         game_string = [string.ljust(45, " ") for string in game_string]
         return game_string
 
@@ -67,15 +64,15 @@ class ConsoleGame:
 
         if action == "f":
             self.game.flip(actual_row, actual_column)
-            return True if self.game.state == GameState.IN_PROGRESS else False
         elif action == "m":
             self.game.toggle_mark(actual_row, actual_column)
-            return True
+
+        return self.game.state == GameState.IN_PROGRESS
 
     def process_input(self):
         print(f"Error! {self.latest_error}" if self.latest_error else "")
         print("Please enter your command:")
-        command_input = input()
+        command_input = input()  # nosec
         try:
             self.latest_error = None
             return self._process_command(command_input)
