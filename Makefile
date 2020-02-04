@@ -33,19 +33,19 @@ endif
 
 prerelease: check_on_master
 	$(POETRY_RUN) bumpversion pre --verbose
-	# git push --follow-tags
+	git push --follow-tags
 
 patch: check_on_master
 	$(POETRY_RUN) bumpversion patch --verbose
-	# git push --follow-tags
+	git push --follow-tags
 
 minor: check_on_master
 	$(POETRY_RUN) bumpversion minor --verbose
-	# git push --follow-tags
+	git push --follow-tags
 
 major: check_on_master
 	$(POETRY_RUN) bumpversion major --verbose
-	# git push --follow-tags
+	git push --follow-tags
 
 build:
 	$(POETRY) build
