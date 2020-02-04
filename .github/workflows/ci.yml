@@ -49,3 +49,10 @@ jobs:
         with:
           name: dist
           path: dist
+
+      - name: Publish to PyPI
+        run: |
+          source $HOME/.poetry/env
+          export PYPI_USERNAME=${{ secrets.PYPIUSER }}
+          export PYPI_PASSWORD=${{ secrets.PYPIPASS }}
+          make publish
