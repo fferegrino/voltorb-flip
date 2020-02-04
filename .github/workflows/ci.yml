@@ -1,0 +1,58 @@
+name: Push action
+
+on: [push]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Setup environment
+        run: |
+          curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+          source $HOME/.poetry/env
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          source $HOME/.poetry/env
+          poetry --version
+          poetry install
+
+      - name: Lint
+        run: |
+          source $HOME/.poetry/env
+          make lint
+
+      - name: Test
+        run: |
+          source $HOME/.poetry/env
+          make test
+
+      - name: Build package
+        run: |
+          source $HOME/.poetry/env
+          poetry build
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish to PyPI
+        run: |
+          source $HOME/.poetry/env
+          export PYPI_USERNAME=${{ secrets.PYPIUSER }}
+          export PYPI_PASSWORD=${{ secrets.PYPIPASS }}
+          make publish

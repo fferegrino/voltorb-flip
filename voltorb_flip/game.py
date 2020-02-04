@@ -1,4 +1,3 @@
-import math
 from enum import Enum
 from random import choices
 
@@ -32,7 +31,7 @@ class GameLostException(GameOverException):
         super().__init__(args, state=GameState.LOST)
 
 
-class VoltorbFlip:
+class VoltorbFlip:  # pylint: disable=too-many-instance-attributes
 
     available_values = [0, 1, 2, 3]
     available_weights = [0.15, 0.5, 0.15, 0.1]
@@ -107,7 +106,6 @@ class VoltorbFlip:
             self._change_cell_state(row, column, CellState.COVERED)
         elif self.cell_states[row][column] == CellState.COVERED:
             self._change_cell_state(row, column, CellState.MARKED)
-
 
     def flip(self, row, column):
         if self.state != GameState.IN_PROGRESS:
