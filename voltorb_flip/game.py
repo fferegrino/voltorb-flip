@@ -1,6 +1,8 @@
 from enum import Enum
 from random import choices
 
+from voltorb_flip import levels
+
 
 class CellState(Enum):
     COVERED = 1
@@ -80,12 +82,19 @@ class VoltorbFlip:  # pylint: disable=too-many-instance-attributes
                 score *= 1 if number == 0 else number
         return score
 
-    def __init__(self, width=5, height=5):
-        self.width = width
-        self.height = height
+    def __init__(self, level=None, width=5, height=5):
+        self.level = level
+        if level is None:
+            self.width = width
+            self.height = height
+            self.board = self._generate_board(width, height)
+        else:
+            self.width = 5
+            self.height = 5
+            self.board = levels.generate_board(level)
+
         self.score = 1
         self.state = GameState.IN_PROGRESS
-        self.board = self._generate_board(width, height)
         self.cell_states = VoltorbFlip._generate_states(width, height)
         (
             self.horizontal_points,

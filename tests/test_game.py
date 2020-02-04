@@ -38,7 +38,7 @@ def test_win(generate_board_mock, board, moves):
     height = len(board)
     width = len(board[0])
 
-    game = VoltorbFlip(width, height)
+    game = VoltorbFlip(width=width, height=height)
 
     assert game.state == GameState.IN_PROGRESS
     for i, j in moves:
@@ -77,7 +77,7 @@ def test_cant_play_game_over(generate_board_mock, board, moves):
     height = len(board)
     width = len(board[0])
 
-    game = VoltorbFlip(width, height)
+    game = VoltorbFlip(width=width, height=height)
 
     assert game.state == GameState.IN_PROGRESS
     for i, j in moves:
@@ -119,7 +119,7 @@ def test_lose(generate_board_mock, board, moves):
     height = len(board)
     width = len(board[0])
 
-    game = VoltorbFlip(width, height)
+    game = VoltorbFlip(width=width, height=height)
 
     assert game.state == GameState.IN_PROGRESS
     for i, j in moves[:-1]:

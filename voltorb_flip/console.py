@@ -16,8 +16,8 @@ COMMAND_REGEX = re.compile(r"([fmq])(?:([a-z])([\d]))?")
 
 
 class ConsoleGame:
-    def __init__(self, width, height):
-        self.game = VoltorbFlip(width=width, height=height)
+    def __init__(self, level, width, height):
+        self.game = VoltorbFlip(level=level, width=width, height=height)
         self.latest_error = None
 
     def get_board(self):
