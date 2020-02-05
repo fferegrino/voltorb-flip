@@ -32,7 +32,7 @@ def help():
     Each level is more difficult than the previous, but you also get more points. There is a maximum of 7 levels.
     Numbers at the end shows the sum of all numbers in the row/column (top), and how much zeroes there are (bottom).
 """
-    )
+    )  # pylint: disable=line-too-long
 
 
 if __name__ == "__main__":

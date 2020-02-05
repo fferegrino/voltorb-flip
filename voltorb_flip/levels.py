@@ -68,9 +68,9 @@ def _chunk(original, size):
 
 
 def generate_board(level):
-    points, x2, x3, x0 = random.choice(CLASSIC_LEVELS[str(level)])
-    x1 = 25 - x3 - x0 - x2
-    cells = [0] * x0 + [1] * x1 + [2] * x2 + [3] * x3
+    _, x_2, x_3, x_0 = random.choice(CLASSIC_LEVELS[str(level)])  # nosec
+    x_1 = 25 - x_3 - x_0 - x_2
+    cells = [0] * x_0 + [1] * x_1 + [2] * x_2 + [3] * x_3
     random.shuffle(cells)
     board_width = 5
     return [cells[i : i + board_width] for i in range(0, len(cells), board_width)]

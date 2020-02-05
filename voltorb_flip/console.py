@@ -50,10 +50,12 @@ class ConsoleGame:
         click.clear()
         board_string = self.get_board()
         print("\n".join(board_string))
+        print(f"Current score {self.game.score}")
 
     def _process_command(self, command):
         action = re.match(COMMAND_REGEX, command)
         if not action:
+            self.latest_error = f'"{command}" is not a valid command!'
             return True
         action, row, column = action.groups()
         if action == "q":
@@ -70,7 +72,13 @@ class ConsoleGame:
         return self.game.state == GameState.IN_PROGRESS
 
     def process_input(self):
+        print()
         print(f"Error! {self.latest_error}" if self.latest_error else "")
+        print()
+        print("Command structure:")
+        print(" - q: quit game")
+        print(" - fXY: flip cell X,Y where X is a letter and Y is a number")
+        print(" - mXY: mark cell X,Y where X is a letter and Y is a number")
         print("Please enter your command:")
         command_input = input()  # nosec
         try:
