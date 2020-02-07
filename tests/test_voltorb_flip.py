@@ -5,23 +5,47 @@ from voltorb_flip.game import VoltorbFlip, CellState
 
 @pytest.fixture
 def patched_init():
-    with patch.object(VoltorbFlip, "__init__", lambda _, width, height: None):
+    with patch.object(VoltorbFlip, "__init__", lambda _: None):
         yield
 
 
+@pytest.mark.parametrize(
+    ["current_level", "accumulated_score", "current_score"],
+    [(1, 0, 10), (7, 10, 1), (8, 1000, 1)],
+)
+def test_bump_game(patched_init, current_level, accumulated_score, current_score):
+    voltorb_flip = VoltorbFlip()
+    voltorb_flip.accumulated_score = accumulated_score
+    voltorb_flip.current_score = current_score
+    voltorb_flip.level = current_level
+
+    voltorb_flip.bump_level()
+
+    assert voltorb_flip.level == min(current_level + 1, VoltorbFlip.MAX_LEVEL)
+    assert voltorb_flip.accumulated_score == accumulated_score + current_score
+    assert voltorb_flip.current_score == 1
+
+
+@pytest.mark.parametrize(
+    ["current_level", "accumulated_score", "current_score"],
+    [(1, 0, 10), (7, 10, 1), (8, 1000, 1)],
+)
+def test_remove_level(patched_init, current_level, accumulated_score, current_score):
+    voltorb_flip = VoltorbFlip()
+    voltorb_flip.accumulated_score = accumulated_score
+    voltorb_flip.current_score = current_score
+    voltorb_flip.level = current_level
+
+    voltorb_flip.remove_level()
+
+    assert voltorb_flip.level == max(current_level - 1, VoltorbFlip.MIN_LEVEL)
+    assert voltorb_flip.accumulated_score == max(accumulated_score - current_score, 0)
+    assert voltorb_flip.current_score == 1
+
+
 @pytest.mark.parametrize("width", [2, 5])
 @pytest.mark.parametrize("height", [2, 5])
-def test_creates_board(width, height):
-
-    board = VoltorbFlip._generate_board(width, height)
-    assert len(board) == height
-    assert len(board[0]) == width
-    assert isinstance(board[0][0], int)
-
-
-@pytest.mark.parametrize("width", [2, 5])
-@pytest.mark.parametrize("height", [2, 5])
-def test_sets_states(patched_init, width, height):
+def test_sets_states(width, height):
 
     states = VoltorbFlip._generate_states(width, height)
 

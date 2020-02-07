@@ -1,12 +1,7 @@
 import pytest
 from unittest.mock import patch
 
-from voltorb_flip.game import (
-    VoltorbFlip,
-    GameState,
-    GameLostException,
-    GameOverException,
-)
+from voltorb_flip.game import VoltorbFlip, GameState, GameOverException
 
 
 @pytest.mark.parametrize(
@@ -32,20 +27,18 @@ from voltorb_flip.game import (
         # fmt: on
     ],
 )
-@patch("voltorb_flip.game.VoltorbFlip._generate_board")
+@patch("voltorb_flip.game.levels.generate_board")
 def test_win(generate_board_mock, board, moves):
     generate_board_mock.return_value = board
-    height = len(board)
-    width = len(board[0])
 
-    game = VoltorbFlip(width=width, height=height)
+    game = VoltorbFlip()
 
     assert game.state == GameState.IN_PROGRESS
     for i, j in moves:
         game.flip(i, j)
     assert game.state == GameState.WON
 
-    generate_board_mock.assert_called_once_with(width, height)
+    generate_board_mock.assert_called_once_with(1)
 
 
 @pytest.mark.parametrize(
@@ -71,13 +64,11 @@ def test_win(generate_board_mock, board, moves):
         # fmt: on
     ],
 )
-@patch("voltorb_flip.game.VoltorbFlip._generate_board")
+@patch("voltorb_flip.game.levels.generate_board")
 def test_cant_play_game_over(generate_board_mock, board, moves):
     generate_board_mock.return_value = board
-    height = len(board)
-    width = len(board[0])
 
-    game = VoltorbFlip(width=width, height=height)
+    game = VoltorbFlip()
 
     assert game.state == GameState.IN_PROGRESS
     for i, j in moves:
@@ -87,7 +78,7 @@ def test_cant_play_game_over(generate_board_mock, board, moves):
         assert excp.state == GameState.WON
     assert game.state == GameState.WON
 
-    generate_board_mock.assert_called_once_with(width, height)
+    generate_board_mock.assert_called_once_with(1)
 
 
 @pytest.mark.parametrize(
@@ -113,20 +104,18 @@ def test_cant_play_game_over(generate_board_mock, board, moves):
         # fmt: on
     ],
 )
-@patch("voltorb_flip.game.VoltorbFlip._generate_board")
+@patch("voltorb_flip.game.levels.generate_board")
 def test_lose(generate_board_mock, board, moves):
     generate_board_mock.return_value = board
-    height = len(board)
-    width = len(board[0])
 
-    game = VoltorbFlip(width=width, height=height)
+    game = VoltorbFlip()
 
     assert game.state == GameState.IN_PROGRESS
     for i, j in moves[:-1]:
         game.flip(i, j)
-    with pytest.raises(GameLostException):
-        i, j = moves[-1]
-        game.flip(i, j)
+
+    i, j = moves[-1]
+    game.flip(i, j)
     assert game.state == GameState.LOST
 
-    generate_board_mock.assert_called_once_with(width, height)
+    generate_board_mock.assert_called_once_with(1)

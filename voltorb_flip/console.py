@@ -50,7 +50,7 @@ class ConsoleGame:
         click.clear()
         board_string = self.get_board()
         print("\n".join(board_string))
-        print(f"Current score {self.game.score}")
+        print(f"Current score {self.game.current_score}")
 
     def _process_command(self, command):
         action = re.match(COMMAND_REGEX, command)
