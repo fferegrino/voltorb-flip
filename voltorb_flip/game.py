@@ -1,5 +1,4 @@
 from enum import Enum
-from random import choices
 
 from voltorb_flip import levels
 

@@ -2,13 +2,15 @@ import re
 
 import click
 
+# fmt: off
 from voltorb_flip.game import (
     CellState,
-    GameLostException,
     GameState,
     UnableToFlipException,
     VoltorbFlip,
 )
+
+# fmt: on
 
 COVERED_CHARACTER = "?"
 MARKED_CHARACTER = "M"
@@ -16,20 +18,22 @@ COMMAND_REGEX = re.compile(r"([fmq])(?:([a-z])([\d]))?")
 
 
 class ConsoleGame:
-    def __init__(self, level, width, height):
-        self.game = VoltorbFlip(level=level, width=width, height=height)
+    def __init__(self):
+        self.game = VoltorbFlip()
         self.latest_error = None
 
     def get_board(self):
         game = self.game
         game_string = []
-        headers_row = "      ".join([str(column + 1) for column in range(game.width)])
+        headers_row = "      ".join(
+            [str(column + 1) for column in range(game.CLASSIC_BOARD_SIZE)]
+        )
         game_string.append(" " * 6 + headers_row)
-        for row in range(game.height):
+        for row in range(game.CLASSIC_BOARD_SIZE):
             row_str = ""
             current_row_label = chr(ord("a") + row)
             row_str = row_str + f"{current_row_label:>3}"
-            for column in range(game.width):
+            for column in range(game.CLASSIC_BOARD_SIZE):
                 value = ConsoleGame._get_cell_value(column, game, row)
                 row_str = row_str + f" [ {value} ] "
             row_str = (
@@ -39,7 +43,7 @@ class ConsoleGame:
         ver_stats_row = "    ".join(
             [
                 f"{game.vertical_points[column]}/{game.vertical_bombs[column]}"
-                for column in range(game.width)
+                for column in range(game.CLASSIC_BOARD_SIZE)
             ]
         )
         game_string.append(" " * 5 + ver_stats_row)
@@ -66,8 +70,6 @@ class ConsoleGame:
 
         if action == "f":
             self.game.flip(actual_row, actual_column)
-        elif action == "m":
-            self.game.toggle_mark(actual_row, actual_column)
 
         return self.game.state == GameState.IN_PROGRESS
 
@@ -89,8 +91,6 @@ class ConsoleGame:
                 f"That cell can't be uncovered, it is {flip_excp.cell_state.name}"
             )
             return True
-        except GameLostException:
-            return False
 
         return True
 
@@ -100,6 +100,6 @@ class ConsoleGame:
         value = str(game.board[row][column])
         if cell_state == CellState.COVERED:
             value = COVERED_CHARACTER
-        elif cell_state == CellState.MARKED:
+        elif cell_state != CellState.UNCOVERED:
             value = MARKED_CHARACTER
         return value
