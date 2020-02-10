@@ -1,11 +1,15 @@
 from enum import Enum
-from random import choices
+
+from voltorb_flip import levels
 
 
 class CellState(Enum):
-    COVERED = 1
-    UNCOVERED = 2
-    MARKED = 3
+    UNCOVERED = -1
+    MARKED_0 = 0
+    MARKED_1 = 1
+    MARKED_2 = 2
+    MARKED_3 = 3
+    COVERED = 4
 
 
 class GameState(Enum):
@@ -26,25 +30,70 @@ class GameOverException(Exception):
         self.state = state
 
 
-class GameLostException(GameOverException):
-    def __init__(self, *args):
-        super().__init__(args, state=GameState.LOST)
-
-
 class VoltorbFlip:  # pylint: disable=too-many-instance-attributes
 
-    available_values = [0, 1, 2, 3]
-    available_weights = [0.15, 0.5, 0.15, 0.1]
+    MAX_LEVEL = 8
+    MIN_LEVEL = 1
+    CLASSIC_BOARD_SIZE = 5
 
-    @staticmethod
-    def _generate_board(width, height):
-        return [
-            [
-                choices(VoltorbFlip.available_values, VoltorbFlip.available_weights)[0]
-                for _ in range(width)
-            ]
-            for _ in range(height)
-        ]
+    def __init__(self):
+        self.level = 1
+        self.accumulated_score = 0
+
+        self.current_score = None
+        self.state = None
+        self.board = None
+        self.horizontal_points = None
+        self.horizontal_bombs = None
+        self.vertical_points = None
+        self.vertical_bombs = None
+        self.cell_states = None
+        self.maximum_points = None
+
+        self.reset_level()
+
+    def reset_level(self):
+        self.current_score = 1
+        self.state = GameState.IN_PROGRESS
+        self.board = levels.generate_board(self.level)
+        self.cell_states = VoltorbFlip._generate_states(
+            VoltorbFlip.CLASSIC_BOARD_SIZE, VoltorbFlip.CLASSIC_BOARD_SIZE
+        )
+        (
+            self.horizontal_points,
+            self.horizontal_bombs,
+            self.vertical_points,
+            self.vertical_bombs,
+        ) = VoltorbFlip._calculate_borders(self.board)
+        self.maximum_points = VoltorbFlip._calculate_winning_score(self.board)
+
+    def bump_level(self):
+        self.level = min(self.level + 1, VoltorbFlip.MAX_LEVEL)
+        self.accumulated_score += self.current_score
+        self.reset_level()
+
+    def remove_level(self):
+        self.level = max(self.level - 1, VoltorbFlip.MIN_LEVEL)
+        self.accumulated_score = max(self.accumulated_score - self.current_score, 0)
+        self.reset_level()
+
+    def flip(self, row, column):
+        if self.state != GameState.IN_PROGRESS:
+            raise GameOverException(state=self.state)
+
+        if self.cell_states[row][column] != CellState.COVERED:
+            raise UnableToFlipException(cell_state=self.cell_states[row][column])
+
+        self._change_cell_state(row, column, CellState.UNCOVERED)
+        self.current_score *= self.board[row][column]
+
+        self._win_or_lose()
+
+    def mark(self, row, column, cell_state):
+        self._change_cell_state(row, column, cell_state)
+
+    def unmark(self, row, column):
+        self._change_cell_state(row, column, CellState.COVERED)
 
     @staticmethod
     def _generate_states(width, height):
@@ -80,51 +129,11 @@ class VoltorbFlip:  # pylint: disable=too-many-instance-attributes
                 score *= 1 if number == 0 else number
         return score
 
-    def __init__(self, width=5, height=5):
-        self.width = width
-        self.height = height
-        self.score = 1
-        self.state = GameState.IN_PROGRESS
-        self.board = self._generate_board(width, height)
-        self.cell_states = VoltorbFlip._generate_states(width, height)
-        (
-            self.horizontal_points,
-            self.horizontal_bombs,
-            self.vertical_points,
-            self.vertical_bombs,
-        ) = VoltorbFlip._calculate_borders(self.board)
-        self.maximum_points = VoltorbFlip._calculate_winning_score(self.board)
-
-    def mark(self, row, column):
-        self._change_cell_state(row, column, CellState.MARKED)
-
-    def unmark(self, row, column):
-        self._change_cell_state(row, column, CellState.COVERED)
-
-    def toggle_mark(self, row, column):
-        if self.cell_states[row][column] == CellState.MARKED:
-            self._change_cell_state(row, column, CellState.COVERED)
-        elif self.cell_states[row][column] == CellState.COVERED:
-            self._change_cell_state(row, column, CellState.MARKED)
-
-    def flip(self, row, column):
-        if self.state != GameState.IN_PROGRESS:
-            raise GameOverException(state=self.state)
-
-        if self.cell_states[row][column] != CellState.COVERED:
-            raise UnableToFlipException(cell_state=self.cell_states[row][column])
-
-        self._change_cell_state(row, column, CellState.UNCOVERED)
-        self.score *= self.board[row][column]
-
-        self._win_or_lose()
-
     def _win_or_lose(self):
-        if self.score == self.maximum_points:
+        if self.current_score == self.maximum_points:
             self.state = GameState.WON
-        elif self.score == 0:
+        elif self.current_score == 0:
             self.state = GameState.LOST
-            raise GameLostException()
 
     def _change_cell_state(self, row, column, new_state):
         if self.cell_states[row][column] == CellState.UNCOVERED:
