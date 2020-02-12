@@ -31,7 +31,7 @@ else
 	$(error You are not in the master branch)
 endif
 
-prerelease: check_on_master
+release: check_on_master
 	$(POETRY_RUN) bumpversion pre --verbose
 	git push --follow-tags
 
