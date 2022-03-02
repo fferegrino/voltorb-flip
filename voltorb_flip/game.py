@@ -56,9 +56,7 @@ class VoltorbFlip:  # pylint: disable=too-many-instance-attributes
         self.current_score = 1
         self.state = GameState.IN_PROGRESS
         self.board = levels.generate_board(self.level)
-        self.cell_states = VoltorbFlip._generate_states(
-            VoltorbFlip.CLASSIC_BOARD_SIZE, VoltorbFlip.CLASSIC_BOARD_SIZE
-        )
+        self.cell_states = VoltorbFlip._generate_states(VoltorbFlip.CLASSIC_BOARD_SIZE, VoltorbFlip.CLASSIC_BOARD_SIZE)
         (
             self.horizontal_points,
             self.horizontal_bombs,

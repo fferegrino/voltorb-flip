@@ -51,12 +51,7 @@ def test_sets_states(width, height):
 
     assert len(states) == height
     assert len(states[0]) == width
-    assert all(
-        [
-            all([state == CellState.COVERED for state in states[i]])
-            for i in range(height)
-        ]
-    )
+    assert all([all([state == CellState.COVERED for state in states[i]]) for i in range(height)])
 
 
 @pytest.mark.parametrize(
@@ -111,9 +106,7 @@ def test_calculate_max_points(board, points):
     ],
 )
 def test_calculate_borders(board, hpoints, hbombs, vpoints, vbombs):
-    actual_hpoints, actual_hbombs, actual_vpoints, actual_vbombs = VoltorbFlip._calculate_borders(
-        board
-    )
+    actual_hpoints, actual_hbombs, actual_vpoints, actual_vbombs = VoltorbFlip._calculate_borders(board)
     assert actual_hbombs == hbombs
     assert actual_hpoints == hpoints
     assert actual_vbombs == vbombs

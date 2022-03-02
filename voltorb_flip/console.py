@@ -25,9 +25,7 @@ class ConsoleGame:
     def get_board(self):
         game = self.game
         game_string = []
-        headers_row = "      ".join(
-            [str(column + 1) for column in range(game.CLASSIC_BOARD_SIZE)]
-        )
+        headers_row = "      ".join([str(column + 1) for column in range(game.CLASSIC_BOARD_SIZE)])
         game_string.append(" " * 6 + headers_row)
         for row in range(game.CLASSIC_BOARD_SIZE):
             row_str = ""
@@ -36,9 +34,7 @@ class ConsoleGame:
             for column in range(game.CLASSIC_BOARD_SIZE):
                 value = ConsoleGame._get_cell_value(column, game, row)
                 row_str = row_str + f" [ {value} ] "
-            row_str = (
-                row_str + f" {game.horizontal_points[row]}/{game.horizontal_bombs[row]}"
-            )
+            row_str = row_str + f" {game.horizontal_points[row]}/{game.horizontal_bombs[row]}"
             game_string.append(row_str)
         ver_stats_row = "    ".join(
             [
@@ -87,9 +83,7 @@ class ConsoleGame:
             self.latest_error = None
             return self._process_command(command_input)
         except UnableToFlipException as flip_excp:
-            self.latest_error = (
-                f"That cell can't be uncovered, it is {flip_excp.cell_state.name}"
-            )
+            self.latest_error = f"That cell can't be uncovered, it is {flip_excp.cell_state.name}"
             return True
 
         return True
