@@ -14,6 +14,7 @@ voltorb-flip = 'voltorb_flip.__main__:cli'
 [tool.poetry.dependencies]
 python = "^3.8"
 click = "^8.0.4"
+rich = "^11.2.0"
 
 [tool.poetry.dev-dependencies]
 advbumpversion = "^1.2"

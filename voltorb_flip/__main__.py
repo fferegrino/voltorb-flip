@@ -1,5 +1,8 @@
 import click
 
+from voltorb_flip.console import ConsoleGame
+from voltorb_flip.game import GameState
+
 
 @click.group()
 def cli():
@@ -8,6 +11,11 @@ def cli():
 
 @cli.command()
 def new():
+    cg = ConsoleGame()
+
+    while cg.game.state == GameState.IN_PROGRESS:
+        cg.draw_game()
+        cg.process_input()
     pass
 
 
