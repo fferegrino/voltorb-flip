@@ -1,6 +1,11 @@
 import re
 
 import click
+from rich import box, print
+from rich.console import Console
+from rich.style import Style
+from rich.table import Table
+from rich.theme import Theme
 
 # fmt: off
 from voltorb_flip.game import (
@@ -12,6 +17,8 @@ from voltorb_flip.game import (
 
 # fmt: on
 
+THEME = Theme({"card": "dim cyan", "bomb": "red"})
+
 COVERED_CHARACTER = "?"
 MARKED_CHARACTER = "M"
 COMMAND_REGEX = re.compile(r"([fmq])(?:([a-z])([\d]))?")
@@ -21,36 +28,46 @@ class ConsoleGame:
     def __init__(self):
         self.game = VoltorbFlip()
         self.latest_error = None
+        self.console = Console(theme=THEME)
 
     def get_board(self):
-        game = self.game
-        game_string = []
-        headers_row = "      ".join([str(column + 1) for column in range(game.CLASSIC_BOARD_SIZE)])
-        game_string.append(" " * 6 + headers_row)
-        for row in range(game.CLASSIC_BOARD_SIZE):
-            row_str = ""
+        table = Table(box=box.ROUNDED)
+
+        # Columns
+        table.add_column(" ")
+        for row in range(self.game.CLASSIC_BOARD_SIZE):
+            table.add_column(str(row + 1))
+        table.add_column("😬")
+        table.add_column("💣")
+
+        # Rows
+        for row in range(self.game.CLASSIC_BOARD_SIZE):
             current_row_label = chr(ord("a") + row)
-            row_str = row_str + f"{current_row_label:>3}"
-            for column in range(game.CLASSIC_BOARD_SIZE):
-                value = ConsoleGame._get_cell_value(column, game, row)
-                row_str = row_str + f" [ {value} ] "
-            row_str = row_str + f" {game.horizontal_points[row]}/{game.horizontal_bombs[row]}"
-            game_string.append(row_str)
-        ver_stats_row = "    ".join(
-            [
-                f"{game.vertical_points[column]}/{game.vertical_bombs[column]}"
-                for column in range(game.CLASSIC_BOARD_SIZE)
-            ]
-        )
-        game_string.append(" " * 5 + ver_stats_row)
-        game_string = [string.ljust(45, " ") for string in game_string]
-        return game_string
+            column_elements = [current_row_label]
+            for column in range(self.game.CLASSIC_BOARD_SIZE):
+                value = ConsoleGame._get_cell_value(column, self.game, row)
+                column_elements.append(value)
+
+            column_elements.append(f"{self.game.vertical_points[row]}")
+            column_elements.append(f"[bomb]{self.game.vertical_bombs[row]}[/bomb]")
+            table.add_row(*column_elements)
+
+        # Last row
+        column_elements = ["😬\n💣"]
+        for row in range(self.game.CLASSIC_BOARD_SIZE):
+            column_elements.append(
+                f"{self.game.horizontal_points[row]}\n[bomb]{self.game.horizontal_bombs[row]}[/bomb]"
+            )
+        column_elements.append("")
+        table.add_row(*column_elements)
+
+        return table
 
     def draw_game(self):
         click.clear()
         board_string = self.get_board()
-        print("\n".join(board_string))
-        print(f"Current score {self.game.current_score}")
+        self.console.print(board_string)
+        self.console.print(f"Current score {self.game.current_score}")
 
     def _process_command(self, command):
         action = re.match(COMMAND_REGEX, command)
