@@ -17,7 +17,10 @@ from voltorb_flip.game import (
 
 # fmt: on
 
-THEME = Theme({"card": "dim cyan", "bomb": "red"})
+THEME = Theme({"card": "dim cyan", "bomb": "red",
+               "flipped_good": Style(color="white", bgcolor="#309f6a"),
+               "covered": Style(color="#309f6a", bgcolor="#309f6a")
+               })
 
 COVERED_CHARACTER = "?"
 MARKED_CHARACTER = "M"
@@ -46,6 +49,12 @@ class ConsoleGame:
             column_elements = [current_row_label]
             for column in range(self.game.CLASSIC_BOARD_SIZE):
                 value = ConsoleGame._get_cell_value(column, self.game, row)
+
+                if value.isnumeric():
+                    value = f"[flipped_good]{value}[/flipped_good]"
+                elif value == COVERED_CHARACTER:
+                    value = f"[covered]{value}[/covered]"
+
                 column_elements.append(value)
 
             column_elements.append(f"{self.game.vertical_points[row]}")
@@ -64,7 +73,7 @@ class ConsoleGame:
         return table
 
     def draw_game(self):
-        click.clear()
+        self.console.clear()
         board_string = self.get_board()
         self.console.print(board_string)
         self.console.print(f"Current score {self.game.current_score}")
@@ -87,14 +96,13 @@ class ConsoleGame:
         return self.game.state == GameState.IN_PROGRESS
 
     def process_input(self):
-        print()
-        print(f"Error! {self.latest_error}" if self.latest_error else "")
-        print()
-        print("Command structure:")
-        print(" - q: quit game")
-        print(" - fXY: flip cell X,Y where X is a letter and Y is a number")
-        print(" - mXY: mark cell X,Y where X is a letter and Y is a number")
-        print("Please enter your command:")
+        self.console.print(f"Error! {self.latest_error}" if self.latest_error else "")
+        self.console.print()
+        self.console.print("Commands structure:")
+        self.console.print(" - q: quit game")
+        self.console.print(" - fXY: flip cell X,Y where X is a letter and Y is a number")
+        self.console.print(" - mXY: mark cell X,Y where X is a letter and Y is a number")
+        self.console.print("Please enter your command:")
         command_input = input()  # nosec
         try:
             self.latest_error = None
