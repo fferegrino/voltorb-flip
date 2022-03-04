@@ -16,6 +16,8 @@ def new():
     while cg.game.state == GameState.IN_PROGRESS:
         cg.draw_game()
         cg.process_input()
+
+    cg.draw_game()
     pass
 
 
