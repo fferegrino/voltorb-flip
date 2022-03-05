@@ -1,5 +1,5 @@
 import re
-import readline
+import readline  # pylint: disable=unused-import
 
 from rich import box
 from rich.console import Console
@@ -7,15 +7,12 @@ from rich.style import Style
 from rich.table import Table
 from rich.theme import Theme
 
-# fmt: off
 from voltorb_flip.game import (
     CellState,
     GameState,
     UnableToFlipException,
     VoltorbFlip,
 )
-
-# fmt: on
 
 THEME = Theme(
     {
@@ -116,7 +113,8 @@ class ConsoleGame:
         if action == "q":
             self.game.end_game()
             return False
-        elif action == "f":
+
+        if action == "f":
             self.game.flip(row, column)
         elif action == "m":
             if self.game.cell_states[row][column] == CellState.MARKED_0:

@@ -11,18 +11,17 @@ def cli():
 
 @cli.command()
 def new():
-    cg = ConsoleGame()
+    console_game = ConsoleGame()
 
-    while cg.game.state == GameState.IN_PROGRESS:
-        cg.draw_game()
-        cg.process_input()
-        if cg.game.state == GameState.WON:
-            cg.game.bump_level()
-        if cg.game.state == GameState.LOST:
-            cg.game.remove_level()
+    while console_game.game.state == GameState.IN_PROGRESS:
+        console_game.draw_game()
+        console_game.process_input()
+        if console_game.game.state == GameState.WON:
+            console_game.game.bump_level()
+        if console_game.game.state == GameState.LOST:
+            console_game.game.remove_level()
 
-    cg.draw_game()
-    pass
+    console_game.draw_game()
 
 
 if __name__ == "__main__":
