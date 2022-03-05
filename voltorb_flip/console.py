@@ -20,7 +20,9 @@ from voltorb_flip.game import (
 THEME = Theme(
     {
         "card": "dim cyan",
-        "bomb": "red",
+        "bomb": Style(color="red", bgcolor="white"),
+        "point": Style(color="navy_blue", bgcolor="deep_sky_blue1"),
+        "prompt_value": Style(bold=True, underline=True, color="black"),
         "flipped_good": Style(color="#123B27", bgcolor="white"),
         "covered": Style(color="#41D98F", bgcolor="#123B27"),
         "header": Style(italic=True),
@@ -45,10 +47,13 @@ class ConsoleGame:
         table_style = {
             "box": box.SIMPLE,
             "padding": 0,
+            "safe_box": False,
+            "collapse_padding": True,
             "show_lines": False,
             "show_header": False,
             "header_style": None,
             "title_style": None,
+            "pad_edge": False,
         }
 
         # Tables
@@ -76,14 +81,16 @@ class ConsoleGame:
 
                 column_elements.append(value)
 
-            column_elements.append(f"{self.game.horizontal_points[row]}")
+            column_elements.append(f"[point]{self.game.horizontal_points[row]}[/point]")
             column_elements.append(f"[bomb]{self.game.horizontal_bombs[row]}[/bomb]")
             table.add_row(*column_elements)
 
         # Last rows
         column_elements = [f"{OK_CHAR}\n{BOMB_CHAR}"]
         for row in range(self.game.CLASSIC_BOARD_SIZE):
-            column_elements.append(f"{self.game.vertical_points[row]}\n[bomb]{self.game.vertical_bombs[row]}[/bomb]")
+            column_elements.append(
+                f"[point]{self.game.vertical_points[row]}[/point]\n[bomb]{self.game.vertical_bombs[row]}[/bomb]"
+            )
         column_elements.append("")
         table.add_row(*column_elements)
 
@@ -93,7 +100,6 @@ class ConsoleGame:
         self.console.clear()
         board_string = self.get_board()
         self.console.print(board_string)
-        self.console.print(f"Current score {self.game.current_score}")
 
     def _process_command(self, command):
         action = re.match(COMMAND_REGEX, command)
@@ -104,10 +110,11 @@ class ConsoleGame:
         command_dict = action.groupdict()
 
         action = command_dict.get("command") or "f"
-        row = ord(command_dict.get("row")) - ord("a")
-        column = int(command_dict.get("column")) - 1
+        row = ord(command_dict.get("row") or "a") - ord("a")
+        column = int(command_dict.get("column") or -1) - 1
 
         if action == "q":
+            self.game.end_game()
             return False
         elif action == "f":
             self.game.flip(row, column)
@@ -120,15 +127,22 @@ class ConsoleGame:
         return self.game.state == GameState.IN_PROGRESS
 
     def process_input(self):
-        self.console.print(f"Error! {self.latest_error}" if self.latest_error else "")
-        self.console.print(
-            "Instructions:",
+        commands = [
             "Flip [command]f<row><column>[/command]",
             "Mark [command]m<row><column>[/command]",
             "Quit [command]q[/command]",
-            sep="  ➤ ",
+        ]
+        if self.latest_error:
+            self.console.print(f"Error! {self.latest_error}")
+
+        self.console.print("Instructions:", ", ".join(commands))
+        prompt = " | ".join(
+            [
+                f"Lv. [prompt_value]{self.game.level}[/prompt_value]",
+                f"Score [prompt_value]{self.game.current_score}[/prompt_value]",
+            ]
         )
-        command_input = input("Command: ")  # nosec
+        command_input = self.console.input(prompt + " > ")  # nosec
         try:
             self.latest_error = None
             return self._process_command(command_input)

@@ -16,6 +16,7 @@ class GameState(Enum):
     IN_PROGRESS = 1
     LOST = 2
     WON = 3
+    STOPPED = 4
 
 
 class UnableToFlipException(Exception):
@@ -74,6 +75,12 @@ class VoltorbFlip:  # pylint: disable=too-many-instance-attributes
         self.level = max(self.level - 1, VoltorbFlip.MIN_LEVEL)
         self.accumulated_score = max(self.accumulated_score - self.current_score, 0)
         self.reset_level()
+
+    def end_game(self):
+        self.level = VoltorbFlip.MIN_LEVEL
+        self.accumulated_score = 0
+        self.reset_level()
+        self.state = GameState.STOPPED
 
     def flip(self, row, column):
         if self.state != GameState.IN_PROGRESS:

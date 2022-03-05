@@ -16,6 +16,10 @@ def new():
     while cg.game.state == GameState.IN_PROGRESS:
         cg.draw_game()
         cg.process_input()
+        if cg.game.state == GameState.WON:
+            cg.game.bump_level()
+        if cg.game.state == GameState.LOST:
+            cg.game.remove_level()
 
     cg.draw_game()
     pass
